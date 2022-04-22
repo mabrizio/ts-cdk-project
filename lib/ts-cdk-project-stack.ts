@@ -95,7 +95,6 @@ export class TsCdkProjectStack extends Stack {
     });
 
     // Outputs
- 
     new CfnOutput(this, 'WebAppURL', {
       value: 'https://' + s3Bucket.bucketDomainName + '/index.html',
       description: 'The URL of our web app',
