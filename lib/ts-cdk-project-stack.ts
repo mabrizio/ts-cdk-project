@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import { Distribution } from 'aws-cdk-lib/aws-cloudfront'
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins'
+import { StringParameter } from 'aws-cdk-lib/aws-ssm'
 
 import { 
   Stack, 
@@ -66,7 +67,8 @@ export class TsCdkProjectStack extends Stack {
     });
 
 
-    const dbInstance = new DatabaseInstance(this, 'db-instance', {
+    // PGSQL Instance
+    const RDSInstance = new DatabaseInstance(this, 'db-instance', {
       vpc,
       vpcSubnets: {
         subnetType: SubnetType.PRIVATE_ISOLATED,
@@ -78,10 +80,7 @@ export class TsCdkProjectStack extends Stack {
         InstanceClass.BURSTABLE3,
         InstanceSize.MICRO,
       ),
-      credentials: Credentials.fromPassword({
-        usermame: 'xxx',
-        password: 'xxxs'
-      }),
+      credentials: Credentials.fromGeneratedSecret('pgadmin'),
       multiAz: false,
       allocatedStorage: 100,
       maxAllocatedStorage: 105,
@@ -113,6 +112,10 @@ export class TsCdkProjectStack extends Stack {
       value: CDN.distributionDomainName,
       description: 'CloudFront distribution Domain',
       exportName: 'DistributionDomain',
+    });
+
+    new CfnOutput(this, 'DBSecretName', {
+      value: RDSInstance.secret?.secretName!,
     });
   }
 }
