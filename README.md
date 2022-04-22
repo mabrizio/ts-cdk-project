@@ -20,7 +20,7 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 The DB database admin password is generated randomly when my stack is created, and its stored in Secrets Manager. This is the command needed to pull the authentication details:
 
 ```bash
-$ aws secretsmanager get-secret-value --secret-id TsCdkProjectStackdbinstance-W3FP8CTRszrl | jq ".SecretString | fromjson"
+$ aws secretsmanager get-secret-value --secret-id my-secrt-name | jq ".SecretString | fromjson"
 ```
 
 This is the output:

@@ -1,7 +1,9 @@
 import { Construct } from 'constructs';
 import { Distribution } from 'aws-cdk-lib/aws-cloudfront'
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins'
-import { StringParameter } from 'aws-cdk-lib/aws-ssm'
+import { Cluster, ContainerImage, AwsLogDriver } from 'aws-cdk-lib/aws-ecs'
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns'
+import { Role, ServicePrincipal, AccountRootPrincipal } from 'aws-cdk-lib/aws-iam'
 
 import { 
   Stack, 
@@ -52,6 +54,7 @@ export class TsCdkProjectStack extends Stack {
         ]
       });
 
+    // Frontend
     const s3Bucket = new Bucket(this, 's3-bucket', {
       bucketName: 'mauricio-growth-days-2022',
       publicReadAccess: false,
@@ -66,6 +69,12 @@ export class TsCdkProjectStack extends Stack {
       defaultBehavior: { origin: new S3Origin(s3Bucket) },
     });
 
+    // Backend
+    // Fargate
+    new ApplicationLoadBalancedFargateService(this, "fargate-service", {
+      taskImageOptions: { image: ContainerImage.fromRegistry("amazon/amazon-ecs-sample") },
+      publicLoadBalancer: true 
+    });
 
     // PGSQL Instance
     const RDSInstance = new DatabaseInstance(this, 'db-instance', {
